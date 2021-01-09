@@ -10,6 +10,8 @@ now = datetime.now()  # current date and time
 str_old = old.strftime("%Y-%m-%d")
 str_now = now.strftime("%Y-%m-%d")
 
+stocks = ["BNGO", "TRXC"] # a bit of initialization with current faves
+
 # web scraping for news
 URL = "https://www.tipranks.com/news/"
 page = requests.get(URL)
@@ -30,11 +32,9 @@ for item in newsHeaders:
             allTexts.append(paragraph)
             possibleTicker = paragraph[paragraph.find("(") + 1:paragraph.find(")")]
             if 6 > len(possibleTicker) > 2:
-                print(possibleTicker)
+                stocks.append(possibleTicker)
 
 # downloading stocks data from yahoo finance
-stocks = ["BNGO", "TRXC"]
-
 data = yf.download(stocks, start=str_old, end=str_now)
 data.head()
 openStocks = data.loc[:, "Open"].copy()
