@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 # date times setting
-old = datetime.now() - timedelta(days=30)  # current date and time
+old = datetime.now() - timedelta(days=300)  # current date and time
 now = datetime.now()  # current date and time
 str_old = old.strftime("%Y-%m-%d")
 str_now = now.strftime("%Y-%m-%d")
@@ -16,6 +16,21 @@ page = requests.get(URL)
 
 soup = BeautifulSoup(page.content, "html.parser")
 newsHeaders = soup.find_all("h3", class_='fontSize5')
+
+# getting news article data and content
+allTexts = []
+for item in newsHeaders:
+    article = requests.get("https://www.tipranks.com" + item.parent.attrs['href'])
+    soupArticle = BeautifulSoup(article.content, "html.parser")
+    dataArticle = soupArticle.find_all("article", class_='fontSize6')
+    contentArticle = dataArticle[0].contents
+    for listItem in contentArticle:
+        if hasattr(listItem, 'text'):
+            paragraph = str(listItem.text)
+            allTexts.append(paragraph)
+            possibleTicker = paragraph[paragraph.find("(") + 1:paragraph.find(")")]
+            if 6 > len(possibleTicker) > 2:
+                print(possibleTicker)
 
 # downloading stocks data from yahoo finance
 stocks = ["BNGO", "TRXC"]
